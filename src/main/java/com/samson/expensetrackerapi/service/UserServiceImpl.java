@@ -38,4 +38,10 @@ public class UserServiceImpl implements UserService{
         ex.setPassword(user.getPassword() != null ? user.getPassword(): ex.getPassword());
         return userRepository.save(ex);
     }
+
+    @Override
+    public void deleteUser(Long id) {
+        User user = readUser(id);
+        userRepository.delete(user);
+    }
 }
