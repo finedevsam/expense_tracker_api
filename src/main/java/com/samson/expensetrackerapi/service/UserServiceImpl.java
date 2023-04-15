@@ -7,7 +7,9 @@ import com.samson.expensetrackerapi.exceptions.ResourceNotFoundException;
 import com.samson.expensetrackerapi.repository.UserRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -31,13 +33,14 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User readUser(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    public User readUser() {
+        Long userId = getLoggedInUser().getId();
+        return userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Override
-    public User updateUser(UserModel user, Long id) {
-        User ex = readUser(id);
+    public User updateUser(UserModel user) {
+        User ex = readUser();
         ex.setName(user.getName() != null ? user.getName(): ex.getName());
         ex.setAge(user.getAge() != null ? user.getAge(): ex.getAge());
         ex.setEmail(user.getEmail() != null ? user.getEmail(): ex.getEmail());
@@ -46,8 +49,16 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public void deleteUser(Long id) {
-        User user = readUser(id);
+    public void deleteUser() {
+        User user = readUser();
         userRepository.delete(user);
+    }
+
+    @Override
+    public User getLoggedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String email = authentication.getName();
+        System.out.println(email);
+        return userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }

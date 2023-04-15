@@ -3,7 +3,6 @@ package com.samson.expensetrackerapi.controller;
 import com.samson.expensetrackerapi.entity.User;
 import com.samson.expensetrackerapi.entity.UserModel;
 import com.samson.expensetrackerapi.service.UserService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,19 +14,19 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity<User> readUser(@PathVariable Long id){
-        return new ResponseEntity<User>(userService.readUser(id), HttpStatus.OK);
+    @GetMapping("/profile")
+    public ResponseEntity<User> readUser(){
+        return new ResponseEntity<User>(userService.readUser(), HttpStatus.OK);
     }
 
-    @PutMapping("/user/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody UserModel userModel){
-        return new ResponseEntity<User>(userService.updateUser(userModel,id), HttpStatus.OK);
+    @PutMapping("/profile")
+    public ResponseEntity<User> updateUser(@RequestBody UserModel userModel){
+        return new ResponseEntity<User>(userService.updateUser(userModel), HttpStatus.OK);
     }
 
-    @DeleteMapping("/user/{id}")
-    public ResponseEntity<HttpStatus> removeUser(@PathVariable(name = "id") Long id){
-        userService.deleteUser(id);
+    @DeleteMapping("deactivate")
+    public ResponseEntity<HttpStatus> removeUser(){
+        userService.deleteUser();
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

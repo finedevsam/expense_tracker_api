@@ -17,14 +17,17 @@ public class ExpenseServiceImpl implements ExpenseService {
     @Autowired
     private ExpenseRepository expenseRepository;
 
+    @Autowired
+    private UserService userService;
+
     @Override
     public Page<Expense> getAllExpenses(Pageable pageable){
-        return expenseRepository.findAll(pageable);
+        return expenseRepository.findByUserId(userService.getLoggedInUser().getId(), pageable);
     }
 
     @Override
     public Expense getExpenseById(Long id) {
-       Optional<Expense> expense = expenseRepository.findById(id);
+       Optional<Expense> expense = expenseRepository.findByUserIdAndId(userService.getLoggedInUser().getId(), id);
        if (expense.isPresent()){
            return expense.get();
        }else {
@@ -40,6 +43,7 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public Expense saveExpenseDetail(Expense expense) {
+        expense.setUser(userService.getLoggedInUser());
         return expenseRepository.save(expense);
     }
 
@@ -56,12 +60,12 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     @Override
     public List<Expense> readByCategory(String category, Pageable pageable) {
-        return expenseRepository.findByCategory(category, pageable).toList();
+        return expenseRepository.findByUserIdAndCategory(userService.getLoggedInUser().getId(), category, pageable).toList();
     }
 
     @Override
     public List<Expense> readByName(String name, Pageable pageable) {
-        return expenseRepository.findByNameContaining(name, pageable).toList();
+        return expenseRepository.findByUserIdAndNameContaining(userService.getLoggedInUser().getId(), name, pageable).toList();
     }
 
     @Override
@@ -72,6 +76,6 @@ public class ExpenseServiceImpl implements ExpenseService {
         if (endDate == null){
             endDate = new Date(System.currentTimeMillis());
         }
-        return expenseRepository.findByDateBetween(startDate, endDate, pageable).toList();
+        return expenseRepository.findByUserIdAndDateBetween(userService.getLoggedInUser().getId(), startDate, endDate, pageable).toList();
     }
 }
