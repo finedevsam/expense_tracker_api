@@ -36,6 +36,6 @@ public class UserServiceImpl implements UserService{
         ex.setAge(user.getAge() != null ? user.getAge(): ex.getAge());
         ex.setEmail(user.getEmail() != null ? user.getEmail(): ex.getEmail());
         ex.setPassword(user.getPassword() != null ? user.getPassword(): ex.getPassword());
-        return ex;
+        return userRepository.save(ex);
     }
 }
